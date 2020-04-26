@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.mixture import GaussianMixture
 from scipy.stats import norm, multivariate_normal
-import streamlit as st
 import plotly.express as px
 from scipy.stats import random_correlation
 from sklearn.datasets import make_spd_matrix
