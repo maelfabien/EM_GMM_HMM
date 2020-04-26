@@ -1,1 +1,1 @@
-web: streamlit run --server.enableCORS false --server.port $PORT em.py
+web: gunicorn app:server
