@@ -1,123 +1,74 @@
+# General
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.mixture import GaussianMixture
 from scipy.stats import norm, multivariate_normal
-import streamlit as st
-import plotly.express as px
-from scipy.stats import random_correlation
-from sklearn.datasets import make_spd_matrix
-import plotly.graph_objects as go
-from gmm import GMM
-np.random.seed(5) #4 causes issue
+import time
 
-from dash.dependencies import Input, Output
+# Data Generation
+from sklearn.datasets import make_spd_matrix
+from gmm import GMM
+from datagen import generate_data
+
+# Visualization and Dash
 import plotly.graph_objects as go
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-import time
+from dash.dependencies import Input, Output
+from contours import plot_contours
 
-def generate_data(n_data, means, covariances, weights):
-    """creates a list of data points"""
-    n_clusters, n_features = means.shape
-    list_clusters = []
+# Latex
+import dash_defer_js_import as dji
 
-    data = np.zeros((n_data, n_features))
-    for i in range(n_data):
-        # pick a cluster id and create data from this cluster
-        k = np.random.choice(n_clusters, size = 1, p = weights)[0]
-        list_clusters.append(k)
-        x = np.random.multivariate_normal(means[k], covariances[k])
-        data[i] = x
-   
-    return data, list_clusters
+md = open("description_gmm.md", "r").read()
 
-X_list = []
-clusters_list = []
+# Initilize the random seed
+np.random.seed(5) #4 causes issue
 
-max_components = 8
-
-i = 1
-
-for k in range(max_components):
-
-	init_means = []
-	init_covariances = []
-	init_weights = []
-
-	min_val = -10
-	max_val = 10
-
-	for j in range(i):
-		x = np.random.randint(min_val,max_val)
-		y = np.random.randint(min_val,max_val)
-		init_means.append([x,y])
-		init_weights.append(np.random.uniform())
-		init_covariances.append(make_spd_matrix(2))
-
-	init_means = np.array(init_means)
-	init_weights = np.array(init_weights)
-	init_weights = init_weights / sum(init_weights)
-
-	# generate data
-	X, list_clusters = generate_data(500, init_means, init_covariances, init_weights)
-	X_list.append(X)
-	clusters_list.append(list_clusters)
-
-	i+=1
-
-def plot_contours(data, means, covs, title, min_x, max_x, min_y, max_y, list_clusters):
-	"""visualize the gaussian components over the data"""
-
-	delta = 0.05
-	k = means.shape[0]
-	x = np.arange(min_x, max_x, delta)
-	y = np.arange(min_y, max_y, delta)
-	x_grid, y_grid= np.meshgrid(x, y)
-
-	coordinates = np.array([x_grid.ravel(), y_grid.ravel()]).T
-
-	z_grid_list = []
-
-	for i in range(k):
-	    mean = means[i]
-	    cov = covs[i]
-	    z_grid = multivariate_normal(mean, cov).pdf(coordinates).reshape(x_grid.shape)
-	    z_grid_list.append(z_grid)
-
-	#fig2.add_scatter(x=data[:, 0], y=data[:, 1], mode="markers")
-
-	fig2 = go.Figure(data=go.Scatter(x=data[:, 0], y=data[:, 1], mode='markers', marker_color=list_clusters), layout={
-        'margin': {'l': 0, 'r': 0, 't': 0, 'b': 0},
-    })
-
-	fig2.add_contour( # = go.Figure(data=go.Contour(
-		z = z_grid_list[0],
-		x = x_grid[0,:],
-		y = y_grid[:,0],
-		contours_coloring='lines',
-		showscale=False,
-    	line_width=2)
-
-	fig2.update_layout(
-              width=500, height=500)
-
-	colorscale_list = ['Hot', 'Electric', 'Inferno', 'Bluered_r', 'Viridis', 'Cividis', 'RdBu', 'Hot', 'Electric', 'Inferno', 'Bluered_r', 'Viridis', 'Cividis', 'RdBu']
-
-	for i in range(1, k):
-
-		fig2.add_contour(x=x_grid[0,:], y=y_grid[:,0], z = z_grid_list[i], contours_coloring='lines',
-			showscale=False,
-        	line_width=2, colorscale=colorscale_list[i])
-
-	return dcc.Graph(figure=fig2)
-
-app = dash.Dash(__name__, external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css'])
+app = dash.Dash(__name__, external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/monokai-sublime.min.css'], assets_external_path='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML')
+app.scripts.config.serve_locally = False
 server = app.server
+
+#mathjax = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML'
+#app.scripts.external_scripts({ 'external_url' : 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML' })
 
 app.title = "EM for GMM and HMM"
 
-# Add a title
+###### important for latex ######
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                tex2jax: {
+                inlineMath: [ ['$','$'],],
+                processEscapes: true
+                }
+            });
+            </script>
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
+
+axis_latex_script = dji.Import(src="https://codepen.io/yueyericardo/pen/pojyvgZ.js")
+mathjax_script = dji.Import(src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_SVG")
+
+
+X_list, clusters_list = generate_data()
+
+
 app.layout = html.Div([  
     html.H1(
       children='EM for HMM and GMM',
@@ -132,11 +83,32 @@ app.layout = html.Div([
     ),
     
     html.Br(),
-    
+
     dcc.Tabs([
         dcc.Tab(label='EM for GMM', children=[
 
 			html.Br(),
+
+		    html.H3(
+		      children='Introduction to GMMs',
+		    ),
+
+		    html.Br(),
+
+  			dcc.Markdown(md, dangerously_allow_html=True, style={'textAlign': 'justify'}),
+
+  			html.Br(),
+
+  			mathjax_script,
+  			axis_latex_script, 
+
+		    html.Hr(),
+
+		    html.H3(
+		      children='EM on Gaussian Data',
+		    ),
+
+		    html.Br(),
 
             # Two columns charts
             html.Div([
@@ -208,22 +180,59 @@ app.layout = html.Div([
 
 		                ], className="six columns"),
 
-		            ], className="row"),
+		        ], className="row"),
+
+	            html.Br(),
+
+				dcc.Loading(
+                    id="loading",
+                    children=[html.Div(id="output_inp")],
+                    type="default",
+                ),
+
+		        html.Br(),
 
                 ], className="six columns"),
 
                 html.Div([
-                ], className="six columns", id='output_viz'),
+                ], className="six columns", id='output_viz')
 
             ], className="row"),
             
+
+
+	    html.Hr(),
+
+	    html.H3(
+	      children='EM/GMM for gender detection',
+	    ),
+
+	    html.Br(),
+
+
         ]),
 
         # Second tab
-        dcc.Tab(label='EM for HMM', children=[ ])        
+        dcc.Tab(label='EM for HMM', children=[ ]),
+
+        # Third tab
+        dcc.Tab(label='EM for GMM/HMM', children=[ ])        
     ])
 ], style={'width': '90%', 'textAlign': 'center', 'margin-left':'5%', 'margin-right':'0'})
 
+@app.callback(
+    dash.dependencies.Output('output_inp', 'children'),
+    [dash.dependencies.Input('num_components', 'value'), dash.dependencies.Input('num_iters', 'value')])
+def return_val(num_components, num_iters):
+	if num_iters < 10:
+		time.sleep(1)
+	elif num_iters < 20:
+		time.sleep(2)
+	elif num_iters <40:
+		time.sleep(3)
+	else:
+		time.sleep(4)
+	#time.sleep(num_iters*0.15)
 
 @app.callback(
     dash.dependencies.Output('output_viz', 'children'),
