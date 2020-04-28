@@ -213,6 +213,8 @@ app.layout = html.Div([
 	    	children='EM on GMM for gender detection',
 	    ),
 
+	    html.Br(),
+
         # Two columns charts
         html.Div([
             html.Div([
