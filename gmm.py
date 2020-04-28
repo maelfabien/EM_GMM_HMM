@@ -89,7 +89,7 @@ class GMM:
             likelihood = multivariate_normal(self.means[k], self.covs[k]).pdf(X)
             self.resp[:, k] = prior * likelihood
 
-        return self
+        return likelihood
 
     def _do_mstep(self, X):
         """M-step, update parameters"""

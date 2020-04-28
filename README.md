@@ -15,6 +15,10 @@ This is a Dash web application dedicated to illustrations of EM for HMM and GMM.
 - `requirements.txt` : the list of requirements for the file
 - `streamlit` : a folder containing Streamlit web application
 - `images` : external images used
+- `gender` : a folder for the gender prediction algorithm
+	- `female.npy` : 2 MFCC features extracted on female trainings (AudioSet)
+	- `male.npy` : 2 MFCC features extracted on female trainings (AudioSet)
+	- `clips` : folder containing 2 wav files from AudioSet (Male and Female)
 
 ## How to use it?
 
