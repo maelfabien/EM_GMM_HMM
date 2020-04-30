@@ -11,7 +11,28 @@ Where:
 
 $$ g(x \mid \mu_k, \Sigma_k) = \frac{1}{(2 \pi)^{\frac{D}{2}} {\mid \Sigma_k \mid}^{\frac{1}{2}}} exp^{ - \frac{1}{2}(x - \mu_k)^T \Sigma_k^{-1} (x-\mu_k)} $$
 
-The parameters of the GMM are therefore : $ \lambda = (w_k, \mu_k, \Sigma_k), k = 1, 2, 3, ..., M $. How do we solve GMM? Using Expectation-Maximization (EM) algorithm. EM algorithm is an interative algorithm which, at each steap, tries to update the parameters in order to maximize the likelihood, and eventually finds the maximum likelihood. Formally, EM algorithm iterative update of the parameters should lead to :
+The parameters of the GMM are therefore : $ \lambda = (w_k, \mu_k, \Sigma_k), k = 1, 2, 3, ..., M $. How do we solve GMM? 
+
+Let's first introduce how to solve it for a single Gaussian. We first introduce the maximum likelihood estimation (MLE) of the parameters of a Gaussian Distribution:
+
+$$ L = \prod_{i=1}^N \frac{1}{\sqrt(2 \pi \sigma^2)} exp^{\frac{−(x_i−μ)^2}{2 \sigma^2}} $$
+
+To find the optimal $ \mu $ and $ \sigma $, one simple needs to set the derivative above to 0 for both parameters, and deriving the values is straightforward.
+
+However, for GMM, the Likelihood can be expressed as:
+
+$$ L(\theta \mid X_1, ..., X_n) = $$
+
+$$ \prod_{i=1}^N \sum_{i=1}^K $$ 
+
+$$ \pi_k N(x_i; \mu_k; \sigma_k^2) $$
+
+However, this likelihood does not have a proper analytical solution. Indeed, if we take the log and try to set the derivative to 0, we obtain:
+
+
+
+
+Using Expectation-Maximization (EM) algorithm. EM algorithm is an interative algorithm which, at each steap, tries to update the parameters in order to maximize the likelihood, and eventually finds the maximum likelihood. Formally, EM algorithm iterative update of the parameters should lead to :
 
 $ \prod_{n=1}^N P(x_n \mid \lambda) $ 
 

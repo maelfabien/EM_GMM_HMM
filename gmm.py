@@ -83,6 +83,7 @@ class GMM:
         self.resp = self.resp / self.resp.sum(axis = 1, keepdims = 1)
         return log_likelihood
 
+
     def _compute_log_likelihood(self, X):
         for k in range(self.n_components):
             prior = self.weights[k]

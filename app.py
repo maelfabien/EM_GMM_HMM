@@ -38,6 +38,11 @@ sound_female = base64.b64encode(open(sound_filename, 'rb').read())
 sound_filename = 'gender/clips/male.wav'  # replace with your own .mp3 file
 sound_male = base64.b64encode(open(sound_filename, 'rb').read())
 
+e_png = 'images/e-step.png'
+e_base64 = base64.b64encode(open(e_png, 'rb').read()).decode('ascii')
+
+m_png = 'images/m-step.png'
+m_base64 = base64.b64encode(open(m_png, 'rb').read()).decode('ascii')
 
 app.title = "EM for GMM and HMM"
 
@@ -109,6 +114,36 @@ app.layout = html.Div([
   			axis_latex_script, 
 
 		    html.Hr(),
+
+		    html.H3(
+		      children='Introduction to EM',
+		    ),
+
+
+
+		    html.Br(),
+
+	        html.Div([
+
+                html.Div([
+
+                	html.H5('E-Step'),
+
+                	html.Img(src='data:image/png;base64,{}'.format(e_base64), style={'max-height' :'100%', 'max-width':'100%'}),
+
+                ], className="six columns"),
+
+                html.Div([
+
+                	html.H5('M-Step'),
+
+                	html.Img(src='data:image/png;base64,{}'.format(m_base64), style={'max-height' :'100%', 'max-width':'100%'}),
+
+	                ], className="six columns"),
+
+	        ], className="row"),
+
+	        html.Hr(),
 
 		    html.H3(
 		      children='EM on Gaussian Data',
