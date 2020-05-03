@@ -19,6 +19,40 @@ def make_data(n_data, means, covariances, weights):
    
     return data, list_clusters
 
+def data_kmeans():
+
+    mean_0 = [0,0]
+    cov_0 = np.array([[1,0.8], [0.8, 1]])
+    mean_1 = [0,0]
+    cov_1 = np.array([[1,-0.8], [-0.8, 1]])
+    
+    init_means = [mean_0, mean_1]
+    cov_init = np.array([cov_0, cov_1])
+    init_means = np.array(init_means)
+
+    X, list_clusters = make_data(1000, init_means, cov_init, [0.5, 0.5])
+
+    return X, list_clusters
+
+def gen_gmm_1d(mu1=-5, cov1 = 2, mu2 = 5, cov2= 4, num_data=5000):
+    
+    list_data = []
+    
+    list_cluster = []
+    
+    for k in range(num_data):
+        val1 = np.random.normal(mu1, cov1)
+        list_data.append(val1)
+        list_cluster.append(1)
+
+    for k in range(num_data):
+        val2 = np.random.normal(mu2, cov2)
+        list_data.append(val2)
+        list_cluster.append(2)
+
+    return list_data, list_cluster
+    
+
 def generate_data():
 
 	X_list = []

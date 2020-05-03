@@ -21,11 +21,7 @@ To find the optimal $ \mu $ and $ \sigma $, one simple needs to set the derivati
 
 However, for GMM, the Likelihood can be expressed as:
 
-$$ L(\theta \mid X_1, ..., X_n) = $$
-
-$$ \prod_{i=1}^N \sum_{i=1}^K $$ 
-
-$$ \pi_k N(x_i; \mu_k; \sigma_k^2) $$
+$$ L(\theta \mid X_1, ..., X_n) = \prod_{i=1}^N \sum_{i=1}^K \pi_k N(x_i; \mu_k; \sigma_k^2) $$
 
 However, this likelihood does not have a proper analytical solution. Indeed, if we take the log and try to set the derivative to 0, we obtain:
 

@@ -57,9 +57,13 @@ class GMM:
         self.converged = False
         self.log_likelihood_trace = []      
 
+        ll = []
+
         for i in range(self.n_iters):
             log_likelihood_new = self._do_estep(X)
             self._do_mstep(X)
+
+            ll.append(log_likelihood_new)
 
             if abs(log_likelihood_new - log_likelihood) <= self.tol:
                 self.converged = True
@@ -68,7 +72,7 @@ class GMM:
             log_likelihood = log_likelihood_new
             self.log_likelihood_trace.append(log_likelihood)
 
-        return self
+        return self, ll
 
     def _do_estep(self, X):
         """

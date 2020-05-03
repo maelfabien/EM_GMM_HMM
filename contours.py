@@ -117,4 +117,4 @@ def plot_contours(data, means, covs, title, min_x, max_x, min_y, max_y, list_clu
 			showscale=False,
         	line_width=2, colorscale=colorscale_list[i])
 
-	return dcc.Graph(figure=fig2)
+	return fig2
