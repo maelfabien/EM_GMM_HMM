@@ -1,5 +1,4 @@
 gunicorn
-PIL
 pandas==1.0.3
 dash_defer_js_import==0.0.2
 plotly==4.6.0
