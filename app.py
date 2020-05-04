@@ -41,6 +41,7 @@ f2.update_layout(
 f2.layout.coloraxis.showscale = False
 f2.layout.margin= {'l': 0, 'r': 0, 't': 0, 'b': 0}
 
+md0 = open("assets/intro.md", "r").read()
 md = open("assets/gmm.md", "r").read()
 md2 = open("assets/kmeans.md", "r").read()
 md3 = open("assets/em_gmm.md", "r").read()
@@ -139,12 +140,9 @@ app.layout = html.Div([
     		html.Br(),
 			html.Br(),
 
-		    html.P(children= """
-	        This website contains an introduction to Expectation Maximization (EM) technique for Gaussian Mixture Models (GMMs) and Hidden Markov Models (HMMs). We present the theory behind those techniques in the Slides section, and provide interactive examples in the different sections of the application. This website was realised by Juan Pablo Zuluaga and Mael Fabien as part of the course "Statistical Sequence Processing" from EPFL. 
+  			dcc.Markdown(md0, dangerously_allow_html=True, style={'textAlign': 'justify'}),
 
-		    The technologies used to build this we used Python implementations of GMMs and HMMs, Plotly and Dash for visualization purposes and Heroku for deployment.
-		    """, style={'textAlign': 'justify'}
-		    ),
+  			html.Br(),
 			    
 	    	html.Br(),
 	    ]),
@@ -647,7 +645,7 @@ app.layout = html.Div([
 	    html.Br(),
 	    html.Hr(),
 	    html.Hr(),
-	    
+
 	    html.Br(),
 
        	html.H3(children="GMM background substraction"),
@@ -659,31 +657,29 @@ app.layout = html.Div([
 	    html.Br(),
 
         # Two columns charts
+
         html.Div([
-            html.Div([
 
-	            html.H5('Choose frame'),
+            html.H5('Choose frame'),
 
-	            dcc.Slider(
-				    id='num_components_back',
-				    min=1,
-				    max=886,
-				    step=1,
-				    value=73,
-				    #vertical=True
-				),
+            dcc.Slider(
+			    id='num_components_back',
+			    min=1,
+			    max=886,
+			    step=1,
+			    value=73,
+			    #vertical=True
+			),
 
-	            html.Br(),
+            html.Br(),
 
-	        ], className="three columns"),
+        ], style={'width': '40%', 'textAlign': "center"}),
 
-            html.Div([
+        html.Div([
 
-            	html.H5('Substracted background'),
-            	html.Div([], id="back")
-	        ], className="nine columns")
-
-	    ], className="row"),
+        	html.H5('Substracted background'),
+        	html.Div([], id="back")
+        ]),
 
         html.Br(),
 
@@ -729,8 +725,8 @@ def show_img(idx):
 	image = Image.open('back/frame%s.jpg'%str(idx))
 	data = np.asarray(image)
 	fig = px.imshow(data, color_continuous_scale='gray')
-	fig.update_layout(
-		          width=800, height=800)
+	#fig.update_layout(
+		          #width=800, height=800)
 	fig.layout.coloraxis.showscale = False
 	fig.layout.margin= {'l': 0, 'r': 0, 't': 0, 'b': 0}
 
