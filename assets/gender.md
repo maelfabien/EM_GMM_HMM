@@ -1,0 +1,5 @@
+GMMs are widely used in speech, for example in gender detection. A GMM is fitted on MFCCs for each gender (we extract 2 MFCC coefficients to be able to visualize it), and we attribute the sample to the GMM with the highest likelihood. The likelihood of a new sample belonging to one GMM or another is simply the weighted sum of the likelihood of belonging to each component of the GMM.
+
+Below, you will find an example of two GMMs fitted on AudioSet, a library of around 3000 audio samples of 10 seconds each, sorted by gender. This is used to train 2 GMMs. You can listen to example of an audio being recognized as male and one being recognized as female below. By sliding the number of itererations and the number of components, it re-trains the two GMMs and displays the GMM components visually for each gender (in blue and red).
+
+Using only 2 MFCC coefficients, we limit the potential accuracy of our model, since 20 coefficients are typically extracted. This kind of approach is now less and less used in speech, and i-vectors/x-vectors based approaches are much more popular.

@@ -51,7 +51,43 @@ def gen_gmm_1d(mu1=-5, cov1 = 2, mu2 = 5, cov2= 4, num_data=5000):
         list_cluster.append(2)
 
     return list_data, list_cluster
-    
+
+def generate_data_3d():
+
+    X_list = []
+    clusters_list = []
+    max_components = 8
+    i = 1
+
+    for k in range(max_components):
+
+        init_means = []
+        init_covariances = []
+        init_weights = []
+
+        min_val = -10
+        max_val = 10
+
+        for j in range(i):
+            x = np.random.randint(min_val,max_val)
+            y = np.random.randint(min_val,max_val)
+            z = np.random.randint(min_val,max_val)
+            init_means.append([x,y, z])
+            init_weights.append(np.random.uniform())
+            init_covariances.append(make_spd_matrix(3))
+
+        init_means = np.array(init_means)
+        init_weights = np.array(init_weights)
+        init_weights = init_weights / sum(init_weights)
+
+        # generate data
+        X, list_clusters = make_data(500, init_means, init_covariances, init_weights)
+        X_list.append(X)
+        clusters_list.append(list_clusters)
+
+        i+=1
+
+    return X_list, clusters_list
 
 def generate_data():
 

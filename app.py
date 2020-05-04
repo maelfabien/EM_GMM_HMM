@@ -6,7 +6,7 @@ import time
 # Data Generation
 from sklearn.datasets import make_spd_matrix
 from gmm import GMM
-from datagen import generate_data, data_kmeans, gen_gmm_1d
+from datagen import generate_data, data_kmeans, gen_gmm_1d, generate_data_3d
 from sklearn.cluster import KMeans
 
 # Visualization and Dash
@@ -41,7 +41,12 @@ f2.update_layout(
 f2.layout.coloraxis.showscale = False
 f2.layout.margin= {'l': 0, 'r': 0, 't': 0, 'b': 0}
 
-md = open("description_gmm.md", "r").read()
+md = open("assets/gmm.md", "r").read()
+md2 = open("assets/kmeans.md", "r").read()
+md3 = open("assets/em_gmm.md", "r").read()
+md4 = open("assets/gender.md", "r").read()
+md5 = open("assets/vecquant.md", "r").read()
+md6 = open("assets/back.md", "r").read()
 
 # Initilize the random seed
 np.random.seed(5) #4 causes issue
@@ -97,153 +102,58 @@ axis_latex_script = dji.Import(src="https://codepen.io/yueyericardo/pen/pojyvgZ.
 mathjax_script = dji.Import(src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_SVG")
 
 X_list, clusters_list = generate_data()
+X_3d, clusters_list3d = generate_data_3d()
 
+# K-Means vs. GMM
 X_k, clus_k = data_kmeans()
 kmeans = KMeans(n_clusters=2, random_state=0).fit(X_k)
-
 figk0 = go.Figure(data=go.Scatter(x=X_k[:, 0], y=X_k[:, 1], mode='markers', marker_color=kmeans.predict(X_k)), layout={
         'margin': {'l': 0, 'r': 0, 't': 0, 'b': 0}})
-
 figk0.update_traces(marker=dict(showscale=False))
 figk0.update_layout(width=700, height=500)
-
 gmm = GMM(n_components = 2, n_iters = 75, tol = 1e-4, seed = 5)
 gmm, ll = gmm.fit(X_k)
-
 figk1 = plot_contours(X_k, gmm.means, gmm.covs, 'Initial clusters', -4, 4, -4, 4, clus_k)
 figk1.update_layout(width=700, height=500)
-
 ret, res = gen_gmm_1d()
 fig3 = px.histogram(x=ret, color=res, marginal="rug")
 fig3.update_layout(height=500)
 fig3.layout.update(showlegend=False)
 
 app.layout = html.Div([  
+	html.Br(),
+
     html.H1(
       children='EM for HMM and GMM',
       style={
          'textAlign': 'center'
       }
     ),
-    
-    dcc.Markdown(children= '''
-        Expectation maximization is widely used in HMMs and GMMs.
-    '''
-    ),
-    
+
     html.Br(),
+    
 
     dcc.Tabs([
-    	dcc.Tab(label='GMM vs. k-Means', children=[
 
+    	dcc.Tab(label="Info", children=[
+    		html.Br(),
+			html.Br(),
 
-		    html.Br(),
+		    html.P(children= """
+	        This website contains an introduction to Expectation Maximization (EM) technique for Gaussian Mixture Models (GMMs) and Hidden Markov Models (HMMs). We present the theory behind those techniques in the Slides section, and provide interactive examples in the different sections of the application. This website was realised by Juan Pablo Zuluaga and Mael Fabien as part of the course "Statistical Sequence Processing" from EPFL. 
 
-            # Two columns charts
-            html.Div([
-                html.Div([
+		    The technologies used to build this we used Python implementations of GMMs and HMMs, Plotly and Dash for visualization purposes and Heroku for deployment.
+		    """, style={'textAlign': 'justify'}
+		    ),
+			    
+	    	html.Br(),
+	    ]),
+    	dcc.Tab(label="Slides", children=[
+    		html.Br(),
 
-		            html.H2('K-Means'),
-		 
-					dcc.Graph(figure=figk0),
+    		html.Iframe(id="embedded-pdf", src="assets/EM.pdf", style={"width": "1000px", "height": "600px"}),
 
-		            html.Br(),
-
-		        ], className="six columns"),
-
-                html.Div([
-
-		            html.H2('GMMs'),
-
-		            dcc.Graph(figure=figk1),
-		          
-		            html.Br(),
-
-		        ], className="six columns")
-
-		    ], className="row"),
-
-            html.Br(),
-
-            html.H3(children="Vector Quantization"),
-
-            html.Div([
-	            html.H5('Number of components'),
-
-				dcc.Slider(
-				    id='num_components_vec',
-				    min=1,
-				    max=8,
-				    step=2,
-				    value=3,
-				    marks={
-				        2: '2',
-				        3: '3',
-				        4: '4',
-				        5: '5',
-				        6: '6',
-				        7: '7',
-				        8: '8'
-				    },
-				),
-			], style={'width': '40%'}),
-          	
-            html.Br(),
-
-            # Two columns charts
-            html.Div([
-                html.Div([
-
-		            html.H5('Original image'),
-		 
-					dcc.Graph(figure=f2),
-
-		            html.Br(),
-
-		        ], className="six columns"),
-
-                html.Div([
-
-                	html.H5('Compressed image'),
-                	html.Div([], id="vecquant")
-		        ], className="six columns")
-
-		    ], className="row"),
-
-            html.Br(),
-
-            html.H3(children="GMM background substraction"),
-
-            # Two columns charts
-            html.Div([
-                html.Div([
-
-		            html.H5('Choose frame'),
-
-		            dcc.Slider(
-					    id='num_components_back',
-					    min=1,
-					    max=886,
-					    step=1,
-					    value=73,
-					    vertical=True
-					),
-
-		            html.Br(),
-
-		        ], className="three columns"),
-
-                html.Div([
-
-                	html.H5('Substracted background'),
-                	html.Div([], id="back")
-		        ], className="nine columns")
-
-		    ], className="row"),
-
-            html.Br(),
-
-    		]),
+		]),
 
         dcc.Tab(label='EM for GMM', children=[
 
@@ -259,29 +169,24 @@ app.layout = html.Div([
 
   			html.Br(),
 
+  			html.H5('Generating data from GMMs in 1-dimension'),
+
   			dcc.Graph(figure=fig3),
 
-  			mathjax_script,
-  			axis_latex_script, 
+            html.Br(),
+            html.Br(),
 
-		    html.Br(),
+  			#mathjax_script,
+  			#axis_latex_script, 
 
-		    html.Hr(),
-
-		    html.Br(),
-
+  			html.H5('Generating data from GMMs in 2-dimensions'),
 
             # Two columns charts
             html.Div([
+
+            	html.Br(),
+
                 html.Div([
-
-		            html.H2('Parameters'),
-		          
-		            html.Br(),
-
-		            html.H5('Generating data from GMMs'),
-
-		            html.Br(),
 
 		            html.Div([
 
@@ -313,11 +218,9 @@ app.layout = html.Div([
 
 		                ], className="six columns")
 
-		        ], className="row"),
+		        	], className="row"),
 
 				html.Br(),
-
-	            html.Br(),
 
 				dcc.Loading(
                     id="loading0",
@@ -327,50 +230,130 @@ app.layout = html.Div([
 
 		        html.Br(),
 
-                ], className="six columns"),
+                ], className="four columns"),
 
                 html.Div([
-                ], className="six columns", id='output_gmm')
+                ], className="seven columns", id='output_gmm')
 
             ], className="row"),
 
             html.Br(),
-
-		    html.Hr(),
-
-		    html.H3(
-		      children='Introduction to EM',
-		    ),
+            html.Br(),
 
 
+  			html.H5('Generating data from GMMs in 3-dimensions'),
+
+            # Two columns charts
+            html.Div([
+
+            	html.Br(),
+            	html.Br(),
+
+                html.Div([
+
+		            html.Div([
+
+		                html.Div([
+
+		                	html.H5('Number of components'),
+
+		                ], className="six columns"),
+
+		                html.Div([
+
+							dcc.Slider(
+							    id='num_components_gmm3d',
+							    min=1,
+							    max=8,
+							    step=1,
+							    value=3,
+							    marks={
+							        1: '1',
+							        2: '2',
+							        3: '3',
+							        4: '4',
+							        5: '5',
+							        6: '6',
+							        7: '7',
+							        8: '8'
+							    },
+							),
+
+		                ], className="six columns")
+
+		        	], className="row"),
+
+				html.Br(),
+
+	            html.Br(),
+
+				dcc.Loading(
+                    id="loading3d",
+                    children=[html.Div(id="output_inp3d")],
+                    type="default",
+                ),
+
+		        html.Br(),
+
+                ], className="four columns"),
+
+                html.Div([
+                ], className="seven columns", id='output_gmm3d')
+
+            ], className="row"),
 
 		    html.Br(),
 
-	        html.Div([
+		    html.Hr(),
+		    html.Hr(),
+
+		    html.Br(),
+
+		    # K-Means
+			html.H3(
+		      children='K-Means, a special case of GMM',
+		    ),
+
+  			dcc.Markdown(md2, dangerously_allow_html=True, style={'textAlign': 'justify'}),
+
+		    html.Br(),
+
+            # Two columns charts
+            html.Div([
+                html.Div([
+
+		            html.H2('K-Means'),
+		 
+					dcc.Graph(figure=figk0),
+
+		            html.Br(),
+
+		        ], className="six columns"),
 
                 html.Div([
 
-                	html.H5('E-Step'),
+		            html.H2('GMMs'),
 
-                	html.Img(src='data:image/png;base64,{}'.format(e_base64), style={'max-height' :'100%', 'max-width':'100%'}),
+		            dcc.Graph(figure=figk1),
+		          
+		            html.Br(),
 
-                ], className="six columns"),
+		        ], className="six columns")
 
-                html.Div([
+		    ], className="row"),
 
-                	html.H5('M-Step'),
-
-                	html.Img(src='data:image/png;base64,{}'.format(m_base64), style={'max-height' :'100%', 'max-width':'100%'}),
-
-	                ], className="six columns"),
-
-	        ], className="row"),
-
+		    html.Br(),
 	        html.Hr(),
+	        html.Br(),
 
 		    html.H3(
 		      children='EM on Gaussian Data',
 		    ),
+
+		    html.Br(),
+
+
+		    dcc.Markdown(md3, dangerously_allow_html=True, style={'textAlign': 'justify'}),
 
 		    html.Br(),
 
@@ -474,6 +457,10 @@ app.layout = html.Div([
 	    ),
 
 	    html.Br(),
+
+		dcc.Markdown(md4, dangerously_allow_html=True, style={'textAlign': 'justify'}),
+
+		html.Br(),
 
         # Two columns charts
         html.Div([
@@ -604,17 +591,110 @@ app.layout = html.Div([
         ], className="row"),
 
 	    html.Br(),
+	    html.Hr(),
+	    html.Br(),
 
+        # Vector Quantization
+        html.H3(children="Vector Quantization with k-Means"),
+
+        html.Br(),
+
+		dcc.Markdown(md5, dangerously_allow_html=True, style={'textAlign': 'justify'}),
+
+	    html.Br(),
+
+        html.Div([
+            html.H5('Number of components'),
+
+			dcc.Slider(
+			    id='num_components_vec',
+			    min=1,
+			    max=8,
+			    step=2,
+			    value=3,
+			    marks={
+			        2: '2',
+			        3: '3',
+			        4: '4',
+			        5: '5',
+			        6: '6',
+			        7: '7',
+			        8: '8'
+			    },
+			),
+		], style={'width': '40%'}),
+
+        # Two columns charts
+        html.Div([
+            html.Div([
+
+	            html.H5('Original image'),
+	 
+				dcc.Graph(figure=f2),
+
+	            html.Br(),
+
+	        ], className="six columns"),
+
+            html.Div([
+
+            	html.H5('Compressed image'),
+            	html.Div([], id="vecquant")
+	        ], className="six columns")
+
+	    ], className="row"),
+
+	    html.Br(),
+	    html.Hr(),
+	    html.Hr(),
+	    
+	    html.Br(),
+
+       	html.H3(children="GMM background substraction"),
+
+       	html.Br(),
+
+		dcc.Markdown(md6, dangerously_allow_html=True, style={'textAlign': 'justify'}),
+
+	    html.Br(),
+
+        # Two columns charts
+        html.Div([
+            html.Div([
+
+	            html.H5('Choose frame'),
+
+	            dcc.Slider(
+				    id='num_components_back',
+				    min=1,
+				    max=886,
+				    step=1,
+				    value=73,
+				    #vertical=True
+				),
+
+	            html.Br(),
+
+	        ], className="three columns"),
+
+            html.Div([
+
+            	html.H5('Substracted background'),
+            	html.Div([], id="back")
+	        ], className="nine columns")
+
+	    ], className="row"),
+
+        html.Br(),
 
         ]),
 
         # Second tab
         dcc.Tab(label='EM for HMM', children=[ ]),
-
-        # Third tab
-        dcc.Tab(label='EM for GMM/HMM', children=[ ])        
+  
     ])
-], style={'width': '90%', 'textAlign': 'center', 'margin-left':'5%', 'margin-right':'0'})
+], style={'width': '85%', 'textAlign': 'center', 'margin-left':'7.5%', 'margin-right':'0'})
+
 
 @app.callback(
     dash.dependencies.Output('vecquant', 'children'),
@@ -641,7 +721,6 @@ def vec_quant(n_clusters):
 
 	return dcc.Graph(figure=f)
 
-
 @app.callback(
     dash.dependencies.Output('back', 'children'),
     [dash.dependencies.Input('num_components_back', 'value')])
@@ -657,6 +736,11 @@ def show_img(idx):
 
 	return dcc.Graph(figure=fig)
 
+@app.callback(
+    dash.dependencies.Output('output_inp3d', 'children'),
+    [dash.dependencies.Input('num_components_gmm3d', 'value')])
+def return_val3d(num_components):
+	time.sleep(0.5)
 
 @app.callback(
     dash.dependencies.Output('output_inp0', 'children'),
@@ -676,7 +760,6 @@ def return_val(num_components, num_iters):
 		time.sleep(3)
 	else:
 		time.sleep(4)
-	#time.sleep(num_iters*0.15)
 
 @app.callback(
     dash.dependencies.Output('output_inp2', 'children'),
@@ -692,9 +775,36 @@ def return_val2(num_components, num_iters):
 		time.sleep(4)
 
 @app.callback(
+    dash.dependencies.Output('output_gmm3d', 'children'),
+    [dash.dependencies.Input('num_components_gmm3d', 'value')])
+def gen_gmm3d(num_components):
+
+	X = X_3d[num_components - 1]
+	list_clusters = clusters_list3d[num_components - 1]
+
+	min_x = int(min(X[:, 0])) - 1
+	max_x = int(max(X[:, 0])) + 1
+
+	min_y = int(min(X[:, 1])) - 1
+	max_y = int(max(X[:, 1])) + 1
+
+	min_z = int(min(X[:, 1])) - 1
+	max_z = int(max(X[:, 1])) + 1
+
+	fig = go.Figure(data=go.Scatter3d(x=X[:, 0], y=X[:, 1], z=X[:, 2], mode='markers', marker_color=list_clusters), layout={
+	        'margin': {'l': 0, 'r': 0, 't': 0, 'b': 0},
+	    })
+
+	fig.update_layout(
+	          width=700, height=500)
+
+	fig.update_traces(marker=dict(showscale=False))
+	return dcc.Graph(figure=fig)
+
+@app.callback(
     dash.dependencies.Output('output_gmm', 'children'),
     [dash.dependencies.Input('num_components_gmm', 'value')])
-def gen_fig0(num_components):
+def gen_gmm2d(num_components):
 
 	X = X_list[num_components - 1]
 	list_clusters = clusters_list[num_components - 1]
@@ -710,11 +820,10 @@ def gen_fig0(num_components):
 	    })
 
 	fig.update_layout(
-	          width=500, height=500)
+	          width=700, height=500)
 
 	fig.update_traces(marker=dict(showscale=False))
 	return dcc.Graph(figure=fig)
-
 
 @app.callback(
     [dash.dependencies.Output('output_viz', 'children'), dash.dependencies.Output('ll', 'children')],
@@ -754,7 +863,6 @@ def gen_fig(num_components, num_iters):
 		)
 
 		return [dcc.Graph(figure=plot_contours(X, gmm.means, gmm.covs, 'Initial clusters', min_x, max_x, min_y, max_y, list_clusters)), dcc.Graph(figure=fig5)]
-
 
 @app.callback(
     dash.dependencies.Output('output_viz2', 'children'),

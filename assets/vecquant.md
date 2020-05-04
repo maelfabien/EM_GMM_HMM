@@ -1,0 +1,3 @@
+The k-Means, once applied on images or other signals, are called Vector Quantization (VQ) and can be used as compression method for images for example, which prevents from storing the value of each pixel, but simply the clusters and the values identified by EM. To be more specific, k-Means is one of the methods that can be used to perform VQ.
+
+In the example below, we fit a k-Means algorithm on an image (you might choose the number of clusters). We can store the output image as regions and cluster values, which is a great way to reduce the space needed to store large images for example.
