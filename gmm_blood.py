@@ -7,10 +7,10 @@ import pandas as pd
 import numpy as np
 
 #evaluation of the model
-from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 # Dimensionality Reduction
-from sklearn.manifold import MDS, Isomap, LocallyLinearEmbedding, TSNE, SpectralEmbedding
+from sklearn.manifold import Isomap, TSNE
 from sklearn.decomposition import KernelPCA
 
 #visuaization 
