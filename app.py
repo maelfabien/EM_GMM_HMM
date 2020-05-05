@@ -18,6 +18,9 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 from contours import plot_contours, plot_concat_contours
 
+# Blood example
+from gmm_blood import plot_data, plot_ic
+
 # Sound
 import base64
 from gender import pipeline
@@ -48,6 +51,8 @@ md3 = open("assets/em_gmm.md", "r").read()
 md4 = open("assets/gender.md", "r").read()
 md5 = open("assets/vecquant.md", "r").read()
 md6 = open("assets/back.md", "r").read()
+md7 = open("assets/blood.md", "r").read()
+md8 = open("assets/aic.md", "r").read()
 
 # Initilize the random seed
 np.random.seed(5) #4 causes issue
@@ -111,15 +116,17 @@ kmeans = KMeans(n_clusters=2, random_state=0).fit(X_k)
 figk0 = go.Figure(data=go.Scatter(x=X_k[:, 0], y=X_k[:, 1], mode='markers', marker_color=kmeans.predict(X_k)), layout={
         'margin': {'l': 0, 'r': 0, 't': 0, 'b': 0}})
 figk0.update_traces(marker=dict(showscale=False))
-figk0.update_layout(width=700, height=500)
+figk0.update_layout(width=600, height=500)
 gmm = GMM(n_components = 2, n_iters = 75, tol = 1e-4, seed = 5)
 gmm, ll = gmm.fit(X_k)
 figk1 = plot_contours(X_k, gmm.means, gmm.covs, 'Initial clusters', -4, 4, -4, 4, clus_k)
-figk1.update_layout(width=700, height=500)
+figk1.update_layout(width=600, height=500)
 ret, res = gen_gmm_1d()
 fig3 = px.histogram(x=ret, color=res, marginal="rug")
 fig3.update_layout(height=500)
 fig3.layout.update(showlegend=False)
+
+fig_blood = plot_ic()
 
 app.layout = html.Div([  
 	html.Br(),
@@ -303,7 +310,6 @@ app.layout = html.Div([
 		    html.Br(),
 
 		    html.Hr(),
-		    html.Hr(),
 
 		    html.Br(),
 
@@ -448,7 +454,9 @@ app.layout = html.Div([
 
         html.Div(children=[], id='ll'),
 
+        html.Br(),
 	    html.Hr(),
+	    html.Br(),
 
 	    html.H3(
 	    	children='EM on GMM for gender detection',
@@ -620,7 +628,7 @@ app.layout = html.Div([
 			        8: '8'
 			    },
 			),
-		], style={'width': '40%'}),
+		], style={'width': '40%', 'textAlign': "center"}),
 
         # Two columns charts
         html.Div([
@@ -644,8 +652,6 @@ app.layout = html.Div([
 
 	    html.Br(),
 	    html.Hr(),
-	    html.Hr(),
-
 	    html.Br(),
 
        	html.H3(children="GMM background substraction"),
@@ -678,8 +684,117 @@ app.layout = html.Div([
         html.Div([
 
         	html.H5('Substracted background'),
-        	html.Div([], id="back")
+
+        	html.Div(children=[], id="back2")
         ]),
+
+        html.Br(),
+		html.Hr(),
+        html.Br(),
+
+       	html.H3(children="GMM for Blood Data Clustering"),
+
+       	html.Br(),
+
+		dcc.Markdown(md7, dangerously_allow_html=True, style={'textAlign': 'justify'}),
+
+	    html.Br(),
+
+        # Two columns charts
+
+        html.Div([
+
+	        html.Div([
+
+	            html.H5('Parameters'),
+
+	            html.Br(),
+
+	            html.Div([
+
+	                html.Div([
+
+	                	html.H5('Number of components'),
+
+	                ], className="six columns"),
+
+	                html.Div([
+
+						dcc.Slider(
+						    id='num_components_blood',
+						    min=1,
+						    max=8,
+						    step=1,
+						    value=3,
+						    marks={
+						        1: '1',
+						        2: '2',
+						        3: '3',
+						        4: '4',
+						        5: '5',
+						        6: '6',
+						        7: '7',
+						        8: '8'
+						    },
+						),
+
+	                ], className="six columns")
+
+	            ], className="row"),
+
+				html.Br(),
+
+	            html.Div([
+
+	                html.Div([
+
+	                	html.H5('Number of iterations'),
+
+	                ], className="six columns"),
+
+	                html.Div([
+
+						dcc.Slider(
+						    id='num_iters_blood',
+						    min=0,
+						    max=50,
+						    step=1,
+						    value=2,
+						    marks={
+						        1: '1',
+						        10: '10',
+						        20: '20',
+						        30: '30',
+						        40: '40',
+						        50: '50'
+						    },
+						),
+
+	                ], className="six columns"),
+
+		        ], className="row"),
+
+	            html.Br(),
+
+	        ], className="six columns"),
+
+	        html.Div([
+
+	        	html.H5('Clustering'),
+	        	html.Div([], id="blood")
+
+	        ], className="six columns"),
+
+        ], className="row"),
+
+        html.Br(),
+ 		html.Br(),
+ 		
+		dcc.Markdown(md8, dangerously_allow_html=True, style={'textAlign': 'justify'}),
+
+	    html.Br(),
+
+        fig_blood,
 
         html.Br(),
 
@@ -690,7 +805,6 @@ app.layout = html.Div([
   
     ])
 ], style={'width': '85%', 'textAlign': 'center', 'margin-left':'7.5%', 'margin-right':'0'})
-
 
 @app.callback(
     dash.dependencies.Output('vecquant', 'children'),
@@ -718,10 +832,10 @@ def vec_quant(n_clusters):
 	return dcc.Graph(figure=f)
 
 @app.callback(
-    dash.dependencies.Output('back', 'children'),
+    dash.dependencies.Output('back2', 'children'),
     [dash.dependencies.Input('num_components_back', 'value')])
 def show_img(idx):
-
+	
 	image = Image.open('back/frame%s.jpg'%str(idx))
 	data = np.asarray(image)
 	fig = px.imshow(data, color_continuous_scale='gray')
@@ -731,6 +845,12 @@ def show_img(idx):
 	fig.layout.margin= {'l': 0, 'r': 0, 't': 0, 'b': 0}
 
 	return dcc.Graph(figure=fig)
+
+@app.callback(
+    dash.dependencies.Output('blood', 'children'),
+    [dash.dependencies.Input('num_components_blood', 'value'), dash.dependencies.Input('num_iters_blood', 'value')])
+def blood_plot(num_components, num_iters):
+	return plot_data(num_components, num_iters)
 
 @app.callback(
     dash.dependencies.Output('output_inp3d', 'children'),

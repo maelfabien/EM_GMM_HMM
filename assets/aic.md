@@ -1,0 +1,1 @@
+We display below the value of information criteria over the number of components in the GMM. The value of Bayesian Information Criterion (BIC) and Aikaki Information Criterion (AIC) should be minimal for the optimal number of components. We notice here that both criteria are minimized for 5 components. BIC tends to penalize more for model complexity than AIC.

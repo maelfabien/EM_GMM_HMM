@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import multivariate_normal
 from sklearn.datasets import make_spd_matrix
 
-np.random.seed(4)
+np.random.seed(5)
 
 def make_data(n_data, means, covariances, weights):
     """creates a list of data points"""
