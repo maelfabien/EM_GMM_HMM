@@ -1,0 +1,3 @@
+Before jumping into a speech-related application, let us generate some data from a Markov Chain which has 3 states. We pre-define the transition matrix. For each state, we also pre-define a GMM with a unique set of parameters (means, variances and weights). We therefore have 3 GMMs that generate observations at 3 different states, and a given probability to make the transition between states.
+
+Using the package `hmmlearn`, we will learn the parameters of the HMM, which are the transition probabilities and the parameters of the underlying GMMs. You can play with the value of the different parameters below, and observe the output on the predicted HMM parameters. 

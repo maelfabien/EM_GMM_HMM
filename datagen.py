@@ -19,6 +19,28 @@ def make_data(n_data, means, covariances, weights):
    
     return data, list_clusters
 
+def gen_gmm_param(shift=0):
+
+    init_means = []
+    init_covariances = []
+    init_weights = []
+
+    min_val = -10
+    max_val = 10
+
+    for j in range(6):
+        x = np.random.randint(min_val,max_val)-shift
+        y = np.random.randint(min_val,max_val)-shift
+        init_means.append([x,y])
+        init_weights.append(np.random.uniform())
+        init_covariances.append(make_spd_matrix(2))
+
+    init_means = np.array(init_means)
+    init_weights = np.array(init_weights)
+    init_weights = init_weights / sum(init_weights)
+    
+    return init_means, init_covariances, init_weights
+
 def data_kmeans():
 
     mean_0 = [0,0]
