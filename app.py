@@ -158,9 +158,9 @@ mathjax_script = dji.Import(src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/
 X_list, clusters_list = generate_data()
 X_3d, clusters_list3d = generate_data_3d()
 
-gmm_1_means, gmm_1_covariances, gmm_1_weights = gen_gmm_param(shift=10)
+gmm_1_means, gmm_1_covariances, gmm_1_weights = gen_gmm_param(shift=30)
 gmm_2_means, gmm_2_covariances, gmm_2_weights = gen_gmm_param()
-gmm_3_means, gmm_3_covariances, gmm_3_weights = gen_gmm_param(shift= -10)
+gmm_3_means, gmm_3_covariances, gmm_3_weights = gen_gmm_param(shift= -30)
 trans_mat = [[0.2, 0.4, 0.2], [0.3, 0.2, 0.5], [0.1, .2, 0.7]]
 
 # K-Means vs. GMM
@@ -745,7 +745,7 @@ app.layout = html.Div([
 		html.Hr(),
         html.Br(),
 
-       	html.H3(children="GMM for Blood Data Clustering"),
+       	html.H3(children="GMM for Breast Cancer Data clustering"),
 
        	html.Br(),
 

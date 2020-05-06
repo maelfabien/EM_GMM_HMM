@@ -1,1 +1,3 @@
-Hidden Markov Models are ...
+Hidden Markov models (HMM) are a statistical approach that tell us the probabilities of sequences of random variables and states. Particularly, HMMs are based on augmenting the 'Markov chains', which makes a very strong assumption that if we want to predict the future of a given sequence, all that matters is the current state, but also the previous states have no impact in the future, excepting via the current state. 
+
+More specifically, we can think a HMM allows us to talk about both, observed events (such as words that we see e.g., in the input of our isolated digit recognizer) and hidden events (like part-of-speech tags on those recordings) that we may think of as causal factors in our probabilistic model. 
